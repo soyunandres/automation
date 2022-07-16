@@ -1,11 +1,13 @@
 package pages;
 
 
+import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -22,11 +24,14 @@ public class BasePage {
     protected static Duration durationtimeout;
     protected static Duration durationsleep;
 
+    private Actions action;
+
     protected static Map<String, Region> regions;
     //protected static Screen screen;
     //protected static Pattern pattern;
 
     static {
+        WebDriverManager.chromedriver().setup();
         ChromeOptions chromeOptions = new ChromeOptions();
         driver = new ChromeDriver(chromeOptions);
         durationtimeout = Duration.ofSeconds(10);
@@ -74,5 +79,16 @@ public class BasePage {
         dropdown.selectByVisibleText(valueToSelect);
 
 
+    }
+    public void hoverOverElement(String locator){
+        action.moveToElement(Find(locator));
+
+    }
+
+    public void doubleClickElement(String locator){
+        action.doubleClick(Find(locator));
+    }
+    public void rightClickElement(String locator){
+        action.contextClick(Find(locator));
     }
 }

@@ -4,6 +4,7 @@ import io.cucumber.java.en.*;
 import pages.GooglePage;
 
 public class GoogleSteps {
+
     GooglePage google = new GooglePage();
     @Given("^Ingresamos a la página de google$")
     public void navigateToGoogle (){
@@ -15,7 +16,7 @@ public class GoogleSteps {
         google.enterSearchCriteria("Google");
     }
 
-    @And("^Damos enter$")
+    @And("^Damos enter a la barra de google$")
     public void clickSearchButton (){
         google.clickGoogleSearch();
     }

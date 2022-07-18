@@ -10,14 +10,16 @@ public class GooglePage extends BasePage  {
     }
 
     public void navigateToGoogle(    ){
-       navigateTo("http://google.com.mx");
+       navigateTo("https://www.google.com");
     }
-    public void clickGoogleSearch(){
-        clickElement(searchButton);
-    }
+
     public void enterSearchCriteria(String criteria){
         write(searchTextField, criteria);
 
+    }
+    public void clickGoogleSearch() throws InterruptedException {
+
+        clickElement(searchButton);
     }
 }
 

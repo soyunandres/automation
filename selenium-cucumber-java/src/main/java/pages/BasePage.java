@@ -1,6 +1,9 @@
 package pages;
 
 
+
+
+
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -11,11 +14,21 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.sikuli.script.*;
 
-import javax.swing.plaf.synth.Region;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 public class BasePage {
     protected static WebDriver driver;
@@ -27,8 +40,13 @@ public class BasePage {
     private Actions action;
 
     protected static Map<String, Region> regions;
-    //protected static Screen screen;
-    //protected static Pattern pattern;
+
+    protected static Screen screen;
+    protected static Pattern pattern;
+    protected  static  DateTimeFormatter dateTimeFormatter;
+    protected static LocalDateTime localDateTime;
+
+
 
     static {
         WebDriverManager.chromedriver().setup();
@@ -38,22 +56,36 @@ public class BasePage {
         durationsleep = Duration.ofSeconds(100);
         wait = new WebDriverWait(driver,durationtimeout ,durationsleep);
         regions = new TreeMap<String, Region>();
+        screen = new Screen();
+        pattern = new Pattern();
+        ImagePath.add(System.getProperty("user.dir"));
+        dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss");
+        localDateTime = LocalDateTime.now();
+
 
     }
 
     public BasePage (WebDriver driver){
         BasePage.driver = driver;
         wait = new WebDriverWait(driver,durationtimeout, durationsleep);
+
     }
 
     public static void navigateTo (String url){
         driver.get(url);
 
     }
+
+    public static void closeDriver() {
+        driver.quit();
+    }
+
     private WebElement Find(String locator){
         return wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(locator)));
     }
     public void clickElement(String locator){
+
+
         Find(locator).click();
     }
 
@@ -91,4 +123,65 @@ public class BasePage {
     public void rightClickElement(String locator){
         action.contextClick(Find(locator));
     }
+
+    public void sendKeys(String sendKeys) throws FindFailed {
+        try {
+
+            screen.type(sendKeys);
+
+        } catch ( Exception e) {
+
+            e.printStackTrace();
+        }
+
+    }
+    public static void mapOfPathOfImages(String directoryOfImages) throws IOException {
+        Stream<Path> path = Files.walk(Paths.get(directoryOfImages));
+        path = path.filter(var -> var.toString().endsWith(".png"));
+        //path.forEach(System.out::println);
+        //Find image in the screen and highlight it
+        path.forEach(var -> {
+            System.out.println(var.toString());
+            pattern = new Pattern(var.toString()).similar(0.2);
+
+            try {
+                Region region = new Region(screen.find(pattern).getRect());
+                if(region.find(pattern) != null) {
+
+                    region.getImage().save(directoryOfImages + dateTimeFormatter.format(localDateTime) + ".png");
+                    System.out.println(pattern.getSimilar() + " similar");
+                }
+
+
+            } catch (FindFailed e) {
+                e.printStackTrace();
+
+            }
+;
+
+        });
+
+
+    }
+    //Read all images from folder and add to list of images
+
+    //Find all images in screen and highlight them
+    public void matchImagesInList() throws FindFailed  {
+        try {
+            screen.findAll(ImagePath.getPaths().get(1));
+
+
+        } catch (FindFailed e) {
+            e.printStackTrace();
+        }
+    }
+    /*
+    public void findImageAndCreateRegion(String image, String text) throws FindFailed {
+        regions.put(text, screen.find(image));
+        pattern = new Pattern(imagePath);
+        screen.setAutoWaitTimeout(durationtimeout.toMillis());
+        screen.find(pattern);
+        regions.put(imagePath, screen.getLastMatch());
+    }*/
+
 }

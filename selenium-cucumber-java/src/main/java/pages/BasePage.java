@@ -8,6 +8,7 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Actions;
@@ -45,6 +46,7 @@ public class BasePage {
     protected static Pattern pattern;
     protected  static  DateTimeFormatter dateTimeFormatter;
     protected static LocalDateTime localDateTime;
+    protected static Region region;
 
 
 
@@ -59,8 +61,10 @@ public class BasePage {
         screen = new Screen();
         pattern = new Pattern();
         ImagePath.add(System.getProperty("user.dir"));
-        dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss");
+        dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss_SSS");
         localDateTime = LocalDateTime.now();
+        region = new Region(screen.getRect());
+
 
 
     }
@@ -135,21 +139,22 @@ public class BasePage {
         }
 
     }
-    public static void mapOfPathOfImages(String directoryOfImages) throws IOException {
+    public Stream bringmeAllPathsOfImages(String directoryOfImages) throws IOException {
         Stream<Path> path = Files.walk(Paths.get(directoryOfImages));
         path = path.filter(var -> var.toString().endsWith(".png"));
         //path.forEach(System.out::println);
-        //Find image in the screen and highlight it
+
         path.forEach(var -> {
             System.out.println(var.toString());
-            pattern = new Pattern(var.toString()).similar(0.2);
+            pattern = pattern.setFilename(var.toString()).similar(0.2);
 
             try {
-                Region region = new Region(screen.find(pattern).getRect());
+                region = region.setRect(screen.find(pattern).getRect());
                 if(region.find(pattern) != null) {
 
-                    region.getImage().save(directoryOfImages + dateTimeFormatter.format(localDateTime) + ".png");
-                    System.out.println(pattern.getSimilar() + " similar");
+
+                    //region.getImage().save(directoryOfImages + dateTimeFormatter.format(localDateTime)  + Math.random() +".png");
+                    System.out.println(pattern.getSimilar() + " similar " );
                 }
 
 
@@ -157,12 +162,12 @@ public class BasePage {
                 e.printStackTrace();
 
             }
-;
+            ;
 
         });
 
 
-    }
+        return path;    }
     //Read all images from folder and add to list of images
 
     //Find all images in screen and highlight them
@@ -183,5 +188,37 @@ public class BasePage {
         screen.find(pattern);
         regions.put(imagePath, screen.getLastMatch());
     }*/
+    public Region findImage(String  path) throws FindFailed {
+        region = region.setRect(screen);
+        region.wait(pattern.setFilename(path).similar(0.6), durationtimeout.toMillis()).highlight(2);
+        region.setRect(region.find(pattern));
+
+        //region.highlight(2).getImage().save("src/main/resources/images/ToolBarOpenAppImages/RemoteDesktopConection/mstsc_3B591LqKfV_1.png");
+
+        ;
+
+        return region;
+    }
+
+    public Region findTextInRegion(String path, String text) throws FindFailed {
+       findImage(path);
+         region.findText(text).highlight(1);
+        return region;
+    }
+    public Region findImageInImage(String imagePath, String imagePathToFind) throws FindFailed {
+        findImage(imagePath);
+        region.find(imagePathToFind).highlight(1);
+        return region;
+    }
+    public Region clickInImage() throws FindFailed {
+      region.click();
+        return region;
+    }
+    public Region dobleClickInImage() throws FindFailed {
+        region.doubleClick();
+        return region;
+    }
+
+
 
 }

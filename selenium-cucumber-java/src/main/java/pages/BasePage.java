@@ -202,7 +202,7 @@ public class BasePage {
 
     public Region findTextInRegion(String path, String text) throws FindFailed {
        findImage(path);
-         region.findText(text).highlight(1);
+         region.setRect(region.findText(text)).highlight(1);
         return region;
     }
     public Region findImageInImage(String imagePath, String imagePathToFind) throws FindFailed {

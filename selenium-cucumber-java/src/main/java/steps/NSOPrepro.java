@@ -34,6 +34,12 @@ public class NSOPrepro {
         // Write code here that turns the phrase above into concrete actions
         nsoPreproPage.clickInAcceptButtonOfLoginNSOPrepro();
     }
+    @And("^Se selecciona en el catálogo la cartera (.+) y se da clic en aceptar$")
+    public void catalogueSelect(String cartera) throws FindFailed {
+        nsoPreproPage.selectCatalogue(cartera);
+
+
+    }
     @Then("^Se visualiza la terminal de NSO$")
     public void se_visualiza_la_terminal_de_nso() {
         // Write code here that turns the phrase above into concrete actions

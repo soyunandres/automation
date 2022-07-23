@@ -9,6 +9,8 @@ public class NSOPreproPage extends BasePage {
     private String acceptUserAccountControlButtonYes = "src/main/resources/images/NSOPreproImages/acceptUserAccountControlButtonYes.png";
     private String loginNSO = "src/main/resources/images/NSOPreproImages/loginNSO.png";
     private String loginNSOAcceptButton = "src/main/resources/images/NSOPreproImages/loginNSOAcceptButton.png";
+    private String catalogue = "src/main/resources/images/NSOPreproImages/catalogue.png";
+    private String catalogueOpenButton = "src/main/resources/images/NSOPreproImages/catalogueOpenButton.png";
     public NSOPreproPage() {
         super(driver);
     }
@@ -30,6 +32,13 @@ public class NSOPreproPage extends BasePage {
         sendKeys(Key.TAB);
         sendKeys(pass);
         Thread.sleep(20000);
+    }
+
+    public void selectCatalogue(String cartera) throws FindFailed {
+        findImage(catalogue);
+        region.findText(cartera).highlight(1).click();
+        findImageInImage(catalogue, catalogueOpenButton);
+        clickInImage();
     }
     public void clickInAcceptButtonOfLoginNSOPrepro() throws FindFailed {
         findImageInImage(loginNSO,loginNSOAcceptButton);
